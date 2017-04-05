@@ -1,0 +1,15 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1491363876000",
+            "Effect": "Allow",
+            "Action": [
+                "sdb:*"
+            ],
+            "Resource": [
+                "arn:aws:sdb:*:*:domain/theylive"
+            ]
+        }
+    ]
+}
