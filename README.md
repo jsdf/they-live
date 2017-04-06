@@ -1,7 +1,7 @@
 ![THEY LIVE](https://i.imgur.com/xjcXdWS.jpg)
 
 THEY LIVE is a simple endpoint health monitor with email notifications, which
-runs on AWS Lambda, SimpleDB and SES, which means it costs next-to-nothing to run.
+runs on AWS free tier services (Lambda, SimpleDB, SES), so it costs next-to-nothing to run.
 
 ### instructions
 
