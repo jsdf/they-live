@@ -18,7 +18,9 @@ const requestAsync = url =>
 /*:: type Site = {name: string, url: string}; */
 /*:: type Stats = {up: boolean, lastUp: number, lastDown: number}; */
 
-async function healthcheck(site /*: Site*/, prevStats /*: Stats*/) {
+async function healthcheck(site /*: Site*/) {
+  const prevStats = await db.read(site);
+
   const {error, response, body} = await requestAsync(site.url);
   const up = !error && response && response.statusCode == 200;
 
@@ -53,8 +55,7 @@ async function cron(
     const stats = await Promise.all(
       options.websites.map(async site => {
         try {
-          const prevStats = await db.read(site);
-          return await healthcheck(site, prevStats);
+          return await healthcheck(site);
         } catch (error) {
           return {
             ...site,
