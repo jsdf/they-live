@@ -5,6 +5,8 @@ runs on AWS free tier services (Lambda, SimpleDB, SES), so it costs next-to-noth
 
 ### instructions
 
+first, clone this repo
+
 copy [config.default.js](config.default.js) to config.js and customise it:
 
 ```js
@@ -32,9 +34,16 @@ verify your email address [in AWS SES console](https://console.aws.amazon.com/se
 deploy using serverless framework
 
 ```bash
-yarn global add serverless
+yarn global add serverless # install globally
 serverless deploy
 ```
 
 watch for a successful invocation [in lambda console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions/theylive-dev-cron?tab=monitoring)
 
+you can also test that it runs locally
+
+
+```bash
+# assuming you've installed serverless globally
+yarn run local
+```
