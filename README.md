@@ -52,6 +52,8 @@ serverless deploy
 
 watch for a successful invocation [in lambda console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions/theylive-dev-cron?tab=monitoring)
 
+logs can be found [in cloudwatch](https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252Ftheylive-dev-cron)
+
 you can also test that it runs locally
 
 
