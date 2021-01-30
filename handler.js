@@ -32,9 +32,7 @@ async function healthcheck(site /*: Site*/) {
 
   await db.write(site, nextStats);
 
-  const message = `THEY LIVE: ${site.name} is now ${
-    nextStats.up ? 'up' : 'down'
-  }`;
+  const message = `THEY LIVE: ${site.name} is now ${nextStats.up ? 'up' : 'down'}`;
   if (prevStats.up !== nextStats.up) {
     console.log('notify.email', message);
     notify.email(message);
@@ -53,7 +51,7 @@ async function cron(
 ) {
   try {
     const stats = await Promise.all(
-      options.websites.map(async site => {
+      (options[context.group] || []).map(async site => {
         try {
           return await healthcheck(site);
         } catch (error) {

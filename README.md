@@ -12,12 +12,24 @@ copy [config.default.js](config.default.js) to config.js and customise it:
 ```js
 module.exports = {
   region: 'us-east-1', // aws region for simpledb & ses
-  websites: [
-    {
-      name: 'example-site', // unique site name
-      url: 'http://example.com/health', // endpoint to request for healthcheck
-    },
-  ],
+  websites: {
+    // websites grouped by key which must match the 'group' parameter
+    // passed to the cron event in serverless.yml. this makes it possible to
+    // configure different intervals of invocation for different endpoints
+    oncePer10Mins: [
+      {
+        name: 'example-site', // unique site name
+        url: 'http://example.com/health', // endpoint to request for healthcheck
+      },
+    ],
+    // another group which pings at a different interval
+    oncePerDay: [
+      {
+        name: 'other-site',
+        url: 'http://example.com/health2',
+      },
+    ],
+  },
   notifyTo: ['someguy@example.com'], // email to notify of health changes
   notifyFrom: 'someguy@example.com', // email to send notification from
 };
@@ -45,5 +57,5 @@ you can also test that it runs locally
 
 ```bash
 # assuming you've installed serverless globally
-yarn run local
+yarn local
 ```

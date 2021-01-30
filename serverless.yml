@@ -3,7 +3,7 @@ service: theylive
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs12.x
 
   stage: dev
   region: us-east-1
@@ -23,4 +23,11 @@ functions:
   cron:
     handler: handler.cron
     events:
-      - schedule: rate(10 minutes)
+      - schedule:
+        rate: rate(10 minutes)
+        input:
+          group: oncePer10Mins
+      - schedule:
+        rate: rate(1 day)
+        input:
+          group: oncePerDay
