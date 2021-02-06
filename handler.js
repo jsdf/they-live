@@ -40,7 +40,7 @@ async function makeRequestWithRetries(site) {
     const {error, response, body} = await requestAsync(site.url);
     const up = !error && response && response.statusCode == 200;
     log(
-      `attempt ${i}: ${up ? 'success' : 'fail'} ${error || (response && response.statusCode)} `
+      `${site.name} attempt ${i + 1}: ${up ? 'success' : 'fail'} ${error || (response && response.statusCode)} `
     );
     if (up || i === attempts - 1) return {error, response, body, up};
     await sleep(interval * 1000);
@@ -80,7 +80,7 @@ async function cron(
 ) {
   try {
     const websites = options.websites[event.group] || [];
-    log('running cron', event.group, websites);
+    log('running cron', event.group, websites.map(w => w.name));
     const stats = await Promise.all(
       websites.map(async site => {
         try {

@@ -13,9 +13,9 @@ copy [config.default.js](config.default.js) to config.js and customise it:
 module.exports = {
   region: 'us-east-1', // aws region for simpledb & ses
   websites: {
-    // websites grouped by key which must match the 'group' parameter
-    // passed to the cron event in serverless.yml. this makes it possible to
-    // configure different intervals of invocation for different endpoints
+    // groups of websites can be defined to ping at different intervals.
+    // the keys of this object must match the 'group' parameter passed to the
+    // cron event in serverless.yml (see below)
     oncePer10Mins: [
       {
         name: 'example-site', // unique site name
@@ -27,6 +27,8 @@ module.exports = {
       {
         name: 'other-site',
         url: 'http://example.com/health2',
+        attempts: 3, // will retry this many times
+        interval: 15, // seconds between retries
       },
     ],
   },
@@ -35,7 +37,7 @@ module.exports = {
 };
 ```
 
-in serverless.yml
+in [serverless.yml](serverless.yml) (note the 'group' param)
 ```yaml
 functions:
   cron:
