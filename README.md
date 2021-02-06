@@ -35,6 +35,22 @@ module.exports = {
 };
 ```
 
+in serverless.yml
+```yaml
+functions:
+  cron:
+    handler: handler.cron
+    events:
+      - schedule:
+        rate: rate(10 minutes)
+        input:
+          group: oncePer10Mins
+      - schedule:
+        rate: rate(1 day)
+        input:
+          group: oncePerDay
+```
+
 run `yarn install` to install dependencies
 
 run `aws configure` if you haven't already, to set up aws credentials
@@ -50,14 +66,10 @@ yarn global add serverless # install globally
 serverless deploy
 ```
 
-watch for a successful invocation [in lambda console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions/theylive-dev-cron?tab=monitoring)
-
-logs can be found [in cloudwatch](https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252Ftheylive-dev-cron)
+watch for a successful invocation [in lambda console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions/theylive-dev-cron?tab=monitoring). scroll down on this page to see the logs in cloudwatch
 
 you can also test that it runs locally
 
-
 ```bash
-# assuming you've installed serverless globally
-yarn local
+yarn local --data='{"group": "oncePerDay"}'
 ```

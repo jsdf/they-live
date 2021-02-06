@@ -15,9 +15,12 @@ module.exports = {
       {
         name: 'other-site',
         url: 'http://example.com/health2',
+        attempts: 3, // will retry this many times
+        interval: 15, // seconds between retries
       },
     ],
   },
+  log: true, // whether to log progress to stdout/cloudwatch
   notifyTo: ['someguy@example.com'], // email to notify of health changes
   notifyFrom: 'someguy@example.com', // email to send notification from
 };

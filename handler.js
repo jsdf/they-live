@@ -8,6 +8,16 @@ const options = require('./options');
 const db = require('./db');
 const notify = require('./notify');
 
+function log(...args) {
+  if (options.log) {
+    console.log(...args);
+  }
+}
+
+function sleep(time) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
 const requestAsync = url =>
   new Promise(resolve => {
     request(url, (error, response, body) => {
@@ -15,32 +25,51 @@ const requestAsync = url =>
     });
   });
 
-/*:: type Site = {name: string, url: string}; */
+/*:: type Site = {
+  name: string,
+  url: string,
+  attempts?: number,
+  interval?: number,
+}; */
 /*:: type Stats = {up: boolean, lastUp: number, lastDown: number}; */
+
+async function makeRequestWithRetries(site) {
+  const attempts = site.attempts != null ? site.attempts : 1;
+  const interval = site.interval != null ? site.interval : 5;
+  for (var i = 0; i < attempts; i++) {
+    const {error, response, body} = await requestAsync(site.url);
+    const up = !error && response && response.statusCode == 200;
+    log(
+      `attempt ${i}: ${up ? 'success' : 'fail'} ${error || (response && response.statusCode)} `
+    );
+    if (up || i === attempts - 1) return {error, response, body, up};
+    await sleep(interval * 1000);
+  }
+  throw new Error(`unreachable`);
+}
 
 async function healthcheck(site /*: Site*/) {
   const prevStats = await db.read(site);
 
-  const {error, response, body} = await requestAsync(site.url);
-  const up = !error && response && response.statusCode == 200;
+  const result = await makeRequestWithRetries(site);
 
   const nextStats = {
-    up: up,
-    lastUp: up ? Date.now() : prevStats.lastUp,
-    lastDown: up ? prevStats.lastDown : Date.now(),
+    up: result.up,
+    lastUp: result.up ? Date.now() : prevStats.lastUp,
+    lastDown: result.up ? prevStats.lastDown : Date.now(),
   };
 
   await db.write(site, nextStats);
 
   const message = `THEY LIVE: ${site.name} is now ${nextStats.up ? 'up' : 'down'}`;
   if (prevStats.up !== nextStats.up) {
-    console.log('notify.email', message);
+    log('notify.email', message);
     notify.email(message);
   }
 
   return {
-    ...nextStats,
-    ...site,
+    site,
+    nextStats,
   };
 }
 
@@ -50,18 +79,21 @@ async function cron(
   callback /*: Function*/
 ) {
   try {
+    const websites = options.websites[event.group] || [];
+    log('running cron', event.group, websites);
     const stats = await Promise.all(
-      (options[context.group] || []).map(async site => {
+      websites.map(async site => {
         try {
           return await healthcheck(site);
         } catch (error) {
           return {
-            ...site,
+            site,
             error,
           };
         }
       })
     );
+    log('completed successfully');
 
     callback(null, {
       message: 'completed healthcheck',
